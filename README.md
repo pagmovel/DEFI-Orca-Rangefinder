@@ -119,12 +119,12 @@ ordenados por **Score** (maior primeiro).
 
 **Filtros disponíveis:**
 
-| Filtro | Exemplo | Efeito |
-|---|---|---|
-| Par | `SOL` | Exibe só pools que contenham "SOL" no nome |
-| TVL mínimo | `$500k` | Remove pools com pouca liquidez |
-| APR mínimo | `50 %` | Filtra pools com retorno concentrado abaixo do limiar |
-| Preset | `Balanceado` | Recalcula largura de range e APR concentrado para o preset escolhido |
+| Filtro      | Exemplo        | Efeito                                                               |
+| ----------- | -------------- | -------------------------------------------------------------------- |
+| Par         | `SOL`        | Exibe só pools que contenham "SOL" no nome                          |
+| TVL mínimo | `$500k`      | Remove pools com pouca liquidez                                      |
+| APR mínimo | `50 %`       | Filtra pools com retorno concentrado abaixo do limiar                |
+| Preset      | `Balanceado` | Recalcula largura de range e APR concentrado para o preset escolhido |
 
 **Colunas — o que olhar:**
 
@@ -180,6 +180,128 @@ npm run dev
 
 Acesse `http://localhost:3000`. O primeiro carregamento pode levar alguns segundos
 enquanto a API da Orca é paginada (~100+ pools).
+
+## Deploy — cPanel (hospedagem compartilhada)
+
+> **Pré-requisito:** o plano deve ter o recurso **"Setup Node.js App"** no cPanel.
+> Sem ele, use Vercel ou Railway (deploy gratuito com `git push`).
+
+### 1. Gerar o build localmente
+
+```bash
+npm run build
+```
+
+### 2. Criar o arquivo de entrada `server.js` na raiz do projeto
+
+```js
+const { createServer } = require("http");
+const { parse } = require("url");
+const next = require("next");
+
+const app = next({ dev: false });
+const handle = app.getRequestHandler();
+
+app.prepare().then(() => {
+  createServer((req, res) => {
+    handle(req, res, parse(req.url, true));
+  }).listen(process.env.PORT || 3000);
+});
+```
+
+> Este arquivo já existe no repositório — não é necessário criá-lo novamente.
+
+### 3. Subir os arquivos via FTP/File Manager
+
+Faça upload dos seguintes itens para a pasta do app no servidor (ex.: `public_html/defi/`):
+
+```
+.next/          ← build gerado (pasta inteira)
+public/         ← assets estáticos
+server.js       ← ponto de entrada Node.js
+package.json
+package-lock.json
+```
+
+> **Não** suba `node_modules/` — ele será instalado no servidor.
+
+### 4. Configurar no cPanel → "Setup Node.js App"
+
+| Campo                    | Valor                                                          |
+| ------------------------ | -------------------------------------------------------------- |
+| Node.js version          | 18.x ou superior                                               |
+| Application mode         | Production                                                     |
+| Application root         | `public_html/defi` (caminho onde os arquivos foram enviados) |
+| Application URL          | Domínio ou subdomínio desejado                               |
+| Application startup file | `server.js`                                                  |
+
+1. Clique em **Create** (ou **Save**).
+2. No painel da app criada, clique em **Run NPM Install** para instalar as dependências.
+3. Clique em **Restart** para iniciar o servidor.
+
+
+cPanel tem "Setup Node.js App" (nem todo plano inclui — verifique no painel).
+
+---
+
+**Passo a passo:**
+
+**1. Criar `server.js`** na raiz do projeto:
+
+```js
+const { createServer } = require("http");
+const { parse } = require("url");
+const next = require("next");
+
+const app = next({ dev: false });
+const handle = app.getRequestHandler();
+
+app.prepare().then(() => {
+  createServer((req, res) => {
+    handle(req, res, parse(req.url, true));
+  }).listen(process.env.PORT || 3000);
+});
+```
+
+**2. Rodar o build localmente:**
+
+```bash
+npm run build
+```
+
+**3. Enviar via FTP/File Manager** estes arquivos:
+
+```
+.next/
+public/
+server.js
+package.json
+package-lock.json
+```
+
+**4. No cPanel → "Setup Node.js App":**
+
+* Node.js version: **18.x** ou superior
+* Application mode: **Production**
+* Application root: pasta onde enviou os arquivos
+* Application startup file: `server.js`
+* Clique **Create**
+
+**5. No painel do app → botão "Run NPM Install"**
+
+**6. Clique "Start App"**
+
+cPanel configura o proxy reverso automaticamente — seu domínio/subdomínio apontará para o app.
+
+---
+
+ **Se não aparecer "Setup Node.js App" no seu cPanel** , o plano não suporta Node.js. Nesse caso só Vercel/Railway resolvem.
+
+### 5. Verificar
+
+Acesse o domínio/subdomínio configurado. O primeiro carregamento pode levar alguns segundos enquanto a API da Orca é paginada.
+
+> **Portas:** o cPanel gerencia o proxy automaticamente — não é necessário expor porta manualmente.
 
 ---
 
