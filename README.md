@@ -2,7 +2,7 @@
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?style=flat-square&logo=typescript&logoColor=white) ![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-06b6d4?style=flat-square&logo=tailwindcss&logoColor=white) ![Solana](https://img.shields.io/badge/Solana-Mainnet-9945ff?style=flat-square&logo=solana&logoColor=white) ![Orca](https://img.shields.io/badge/Orca-Whirlpool-00c2a3?style=flat-square) ![Tests](https://img.shields.io/badge/testes-35%20passando-22c55e?style=flat-square) ![License](https://img.shields.io/badge/licença-MIT-gray?style=flat-square)
 
-# Rangefinder
+# DEFI - ORCA Rangefinder
 
 **Screener de oportunidades em pools de liquidez concentrada da Orca (Solana)**
 
@@ -19,11 +19,11 @@ Rangefinder é um dashboard de análise **somente leitura** — sem carteira, se
 Ele consome a API pública da Orca, filtra pools relevantes e aplica um modelo log-normal
 para recomendar ranges de liquidez concentrada com diferentes perfis de risco:
 
-| Preset | k | Prob. no range |
-|---|---|---|
-| Conservador | 1,96 | ~95 % |
-| Balanceado | 1,28 | ~80 % |
-| Agressivo | 1,00 | ~68 % |
+| Preset      | k    | Prob. no range |
+| ----------- | ---- | -------------- |
+| Conservador | 1,96 | ~95 %          |
+| Balanceado  | 1,28 | ~80 %          |
+| Agressivo   | 1,00 | ~68 %          |
 
 A página de detalhe de cada pool exibe os três ranges com régua visual, eficiência de capital
 e APR concentrado estimado, além de um botão direto para aportar na Orca.
@@ -39,10 +39,10 @@ e APR concentrado estimado, além de um botão direto para aportar na Orca.
 
 ## Fontes de dados
 
-| Fonte | Uso | Limite |
-|---|---|---|
-| `api.orca.so/v2/solana/pools` | Lista de pools, preços, TVL, volume, histórico 7d | Sem chave, CORS aberto |
-| `api.geckoterminal.com` (OHLCV horário) | Volatilidade melhor na página de detalhe | Sem chave, 30 req/min — só server-side |
+| Fonte                                      | Uso                                                 | Limite                                   |
+| ------------------------------------------ | --------------------------------------------------- | ---------------------------------------- |
+| `api.orca.so/v2/solana/pools`            | Lista de pools, preços, TVL, volume, histórico 7d | Sem chave, CORS aberto                   |
+| `api.geckoterminal.com` (OHLCV horário) | Volatilidade melhor na página de detalhe           | Sem chave, 30 req/min — só server-side |
 
 ## Modelo matemático
 
