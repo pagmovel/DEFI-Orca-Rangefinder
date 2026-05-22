@@ -102,6 +102,73 @@ lib/
   format.ts                 # formatadores pt-BR (USD, %, preço, múltiplo)
 ```
 
+## Como usar
+
+### 1. Subir o servidor
+
+```bash
+npm install
+npm run dev
+# → http://localhost:3000
+```
+
+### 2. Screener — encontrar oportunidades
+
+A tabela carrega automaticamente todos os pools da Orca com TVL ≥ US$ 100k,
+ordenados por **Score** (maior primeiro).
+
+**Filtros disponíveis:**
+
+| Filtro | Exemplo | Efeito |
+|---|---|---|
+| Par | `SOL` | Exibe só pools que contenham "SOL" no nome |
+| TVL mínimo | `$500k` | Remove pools com pouca liquidez |
+| APR mínimo | `50 %` | Filtra pools com retorno concentrado abaixo do limiar |
+| Preset | `Balanceado` | Recalcula largura de range e APR concentrado para o preset escolhido |
+
+**Colunas — o que olhar:**
+
+- `σ / dia` em **coral** (> 12 %) → mercado muito volátil, range precisará ser largo
+- `APR concentrado` em **aqua** → retorno esperado com liquidez concentrada no preset ativo
+- `Score` → métrica combinada; prefira valores altos com `σ` moderada
+
+### 3. Detalhe do pool — escolher o range
+
+Clique em qualquer linha para abrir a análise completa do pool.
+
+```
+http://localhost:3000/pool/<endereço-do-pool>
+```
+
+Três cards são exibidos — um por preset:
+
+```
+┌─────────────────────────────────────────┐
+│ Conservador          ~95% no range      │
+│  ════════▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓╋════════  │
+│  Largura              ±12,4%            │
+│  Eficiência           3,2×              │
+│  APR concentrado      187,5%            │
+│  [ APORTAR NA ORCA ↗ ]                  │
+└─────────────────────────────────────────┘
+```
+
+- **Régua visual** — banda colorida = range recomendado; marcador `╋` = preço atual;
+  colchetes acima = amplitude observada nos últimos 7 dias
+- **APORTAR NA ORCA** — abre o pool diretamente no app da Orca em nova aba,
+  pronto para configurar a posição
+
+### 4. Escolher o preset certo
+
+```
+Alta confiança, menor APR → Conservador (k = 1,96, ~95 %)
+Equilíbrio risco/retorno  → Balanceado  (k = 1,28, ~80 %)  ← padrão
+Máximo APR, mais rebalanceios → Agressivo (k = 1,00, ~68 %)
+```
+
+> **Regra de bolso:** se `σ / dia > 10 %`, prefira o preset Conservador.
+> Ranges estreitos em ativos voláteis ficam fora da faixa rapidamente e param de gerar fees.
+
 ## Desenvolvimento
 
 Requer Node.js ≥ 18. Clone, instale e inicie:
